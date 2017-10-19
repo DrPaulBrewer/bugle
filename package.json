@@ -15,7 +15,7 @@
   "repository": {
       "type": "git",
       "url": "https://github.com/DrPaulBrewer/bugle.git"
-  }
+  },
   "author": "drpaulbrewer@eaftc.com",
   "license": "MIT",
   "dependencies": {

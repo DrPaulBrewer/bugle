@@ -1,4 +1,4 @@
-# bugle
+# bugle ![free image of a bugle](https://upload.wikimedia.org/wikipedia/en/1/13/Bugle_logo2.png)
 
 A Hapi plugin for Google Drive Login with:
 

@@ -27,10 +27,10 @@ them, add the "refreshTokenStash" setting below. Otherwise that can be omitted.
     {
       "drive": {
           "refreshTokenStash": {
-	      "location": "appDataFolder",
-	      "file": "r",
-	      "key": "makeUpSomthingBetterThanThisForYourIronEncryptionKey"
-	   }
+    	      "location": "appDataFolder",
+	          "file": "r",
+	          "key": "makeUpSomthingBetterThanThisForYourIronEncryptionKey"
+	      }
        },
        "myRedirect": "/a/me", // where to send users who have logged in with Google Drive -- defaults to /a/me
        "useMeLevel": 2, // level from 0-4 to determine what to return from /a/me -- 0 is 404 (default), 1 is name+pic, 2 includes drive profile, 3 headers, 4 server info 
@@ -52,10 +52,10 @@ Configure grant like this for an app that wants to:
     {
        "server": {
            "protocol": "https",   // you do use https, dont you?
-	   "host": "example.com",
-	   "callback": "/a/googledrive",
-	   "transport": "session",
-	   "state": true
+    	   "host": "example.com",
+	       "callback": "/a/googledrive",
+	       "transport": "session",
+	       "state": true
         },
 	"google": {
 	    "key": "your-api-console-drive-client-id-goes-here",
@@ -63,11 +63,11 @@ Configure grant like this for an app that wants to:
             "scope": [
 	        "https://www.googleapis.com/auth/drive.file",	
 	        "https://www.googleapis.com/auth/drive.appdata"
-	    ],
-	    "callback": "/a/googledrive",
-	    "custom_params": {
-		"access_type": "offline"
-	    }
+	        ],
+     	    "callback": "/a/googledrive",
+	        "custom_params": {
+		    "access_type": "offline"
+	        }
         }
     }
 
@@ -83,9 +83,9 @@ In documentation, though, it is suggested to reuse the old refresh tokens until 
     {
        "cookieOptions": {
             "password": "changeThisPasswordToSomethingHardToGuessBecauseItEncryptsTheCookiesWithTheDriveTokens",
-	    "isSecure": true,  // use true if you are using https
+	        "isSecure": true,  // use true if you are using https
             "isSameSite": false  
-	}
+         	}
     }
 
 ### Example Hapi Server

@@ -1,0 +1,25 @@
+{
+  "name": "bugle",
+  "version": "0.1.0",
+  "description": "Hapi plugin for Google Drive Login with refresh token storage policy and drive API extensions from npm: decorated-google-drive",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+      "google-drive",
+      "hapi",
+      "hapijs",
+      "token-management"
+  ],
+  "author": "drpaulbrewer@eaftc.com",
+  "license": "MIT",
+  "dependencies": {
+    "boom": "^6.0.0",
+    "decorated-google-drive": "^0.3.2",
+    "googleapis": "^22.2.0",
+    "iron": "^5.0.1",
+    "request": "^2.83.0",
+    "string-to-stream": "^1.1.0"
+  }
+}

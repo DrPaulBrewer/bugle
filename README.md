@@ -48,28 +48,29 @@ Configure grant like this for an app that wants to:
 * read/write its own files from the user's Google Drive
 * read/write the secret appDataFolder on the user's Google Drive 
 
-
-    {
-       "server": {
-           "protocol": "https",   // you do use https, dont you?
-    	   "host": "example.com",
-	       "callback": "/a/googledrive",
-	       "transport": "session",
-	       "state": true
-        },
-	"google": {
-	    "key": "your-api-console-drive-client-id-goes-here",
-	    "secret": "your-api-console-drive-secret-goes-here"
-            "scope": [
-	        "https://www.googleapis.com/auth/drive.file",	
-	        "https://www.googleapis.com/auth/drive.appdata"
-	        ],
-     	    "callback": "/a/googledrive",
-	        "custom_params": {
-		    "access_type": "offline"
-	        }
+```
+{
+    "server": {
+        "protocol": "https",   // you do use https, dont you?
+        "host": "example.com",
+        "callback": "/a/googledrive",
+        "transport": "session",
+        "state": true
+     },
+     "google": {
+        "key": "your-api-console-drive-client-id-goes-here",
+        "secret": "your-api-console-drive-secret-goes-here"
+        "scope": [
+             "https://www.googleapis.com/auth/drive.file",	
+             "https://www.googleapis.com/auth/drive.appdata"
+         ],
+        "callback": "/a/googledrive",
+        "custom_params": {
+             "access_type": "offline"
         }
-    }
+     }
+}
+```
 
 
 Note:  Adding `"prompt": "consent"` to `custom_params` forces the Google app consent dialog every login, yielding new refresh tokens each time.

@@ -20,7 +20,7 @@
   "license": "MIT",
   "dependencies": {
     "boom": "^6.0.0",
-    "decorated-google-drive": "^0.3.2",
+    "decorated-google-drive": "^0.4.0",
     "googleapis": "^22.2.0",
     "iron": "^5.0.1",
     "request": "^2.83.0",

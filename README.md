@@ -8,6 +8,10 @@ A Hapi plugin for Google Drive Login with:
 
 ## Usage
 
+### Hapi Compatibility
+
+1.0.0 works with hapi 16 but not hapi 17
+
 ### Installation
 
     npm i bugle -S

@@ -27,8 +27,8 @@
   },
   "dependencies": {
     "boom": "^6.0.0",
-    "decorated-google-drive": "^2.0.0",
-    "googleapis": "^22.2.0",
+    "decorated-google-drive": "^2",
+    "googleapis": "^24.0.0",
     "iron": "^5.0.4",
     "request": "^2.83.0",
     "string-to-stream": "^1.1.0"

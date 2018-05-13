@@ -8,9 +8,11 @@ A Hapi plugin for Google Drive Login with:
 
 ## Usage
 
-### Hapi Compatibility
+### Compatibility
 
-1.0.0 works with hapi 16 but not hapi 17
+* bugle@1.0.0 and bugle@2.0.0 work with hapi 16 but not hapi 17
+* bugle@1.0.0 works with googleapis@24.0.0, where the drive API still uses callbacks
+* bugle@2.0.0 works with googleapis@30.0.0, where the drive API uses Promises/async function
 
 ### Installation
 
@@ -179,5 +181,3 @@ Google Drive[tm] is a trademark of Google, Inc.
     
 npm: googleapis is a Google-provided nodejs client for Google APIs such as Google Drive, linked to/referenced from our code. License: Apache 2.0
 A copy is not included herein, but running `npm install` may install one.
-
-

@@ -19,7 +19,7 @@
   "author": "drpaulbrewer@eaftc.com",
   "license": "MIT",
   "engines": {
-    "node": ">=7"
+    "node": ">=8"
   },
   "peerDependencies": {
     "grant-hapi": ">=3.8.0 <4",
@@ -27,10 +27,10 @@
   },
   "dependencies": {
     "boom": "^6.0.0",
-    "decorated-google-drive": "^3",
-    "googleapis": "^24.0.0",
+    "decorated-google-drive": "^4",
+    "googleapis": "^30.0.0",
     "iron": "^5.0.4",
-    "request": "^2.83.0",
+    "request": "^2.85.0",
     "string-to-stream": "^1.1.0"
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "bugle",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Hapi plugin for Google Drive Login with refresh token storage policy and drive API extensions from npm: decorated-google-drive",
   "main": "index.js",
   "scripts": {

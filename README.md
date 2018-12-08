@@ -13,6 +13,7 @@ A Hapi plugin for Google Drive Login with:
 * bugle@1.0.0 and bugle@2.0.0 work with hapi 16 but not hapi 17
 * bugle@1.0.0 works with googleapis@24.0.0, where the drive API still uses callbacks
 * bugle@2.0.0 works with googleapis@30.0.0, where the drive API uses Promises/async function
+* bugle@2.0.1 works with googleapis@36.0.0
 
 ### Installation
 

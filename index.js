@@ -60,13 +60,56 @@ function bugle(server, options, next) {
     }
   }
 
+  function pGetDriveTokens(req) {
+    if (req.params && req.params.state && req.params.code && req.params.scope) {
+      const oAuth2Client = new googleapis.auth.OAuth2(
+        googleCred.key,
+        googleCred.secret,
+        googleCred.redirect
+      );
+      return (
+        oAuth2Client
+        .getToken(req.params.code)
+        .then((r) => (r.tokens))
+      );
+    }
+    const tokens = getTokensFromCookie(req);
+    if (tokens) return Promise.resolve(tokens);
+    return Promise.reject("no tokens");
+  }
 
   function spinupGoogleDrive(req, reply) {
-    const tokens = getTokensFromCookie(req);
-    if (tokens && (tokens.access_token)) {
-      req.drive = driveX(googleapis, request, googleCred, tokens, options.hexidSalt);
-    }
-    reply.continue();
+    (pGetDriveTokens(req)
+      .then((tokens) => {
+        if (tokens && (tokens.access_token)) {
+          req.drive = driveX(googleapis, request, googleCred, tokens, options.hexidSalt);
+        }
+        if (req.params && req.params.state && req.params.code && req.params.scope){
+          req.params.state = JSON.parse(req.params.state);
+          if (req.drive){
+            const ids = req.param.state.ids;
+            const fileId = (ids && ids[0]) || req.param.state.id ;
+            const fields = '*';
+            if (fileId){
+                (req
+                  .drive
+                  .files
+                  .get({fileId, fields})
+                  .then((r)=>(r.data))
+                  .then(f=>{req.driveFile = f; })
+                  .then( ()=>(reply.continue()), ()=>(reply.continue()))
+                );
+            } else {
+              reply.continue();
+            }
+          } else {
+            reply.continue();
+          }
+        } else {
+          reply.continue();
+        }
+      })
+    );
   }
 
 

@@ -30,6 +30,7 @@
     "decorated-google-drive": "^4",
     "googleapis": "^36.0.0",
     "iron": "^5.0.6",
+    "open-from-google-drive": "^0.1.0",
     "request": "^2.85.0",
     "string-to-stream": "^1.1.1"
   }

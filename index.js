@@ -189,7 +189,7 @@ function bugle(server, options, next) {
     },
     {
       method: 'GET',
-      path: '/a/test-open'
+      path: '/a/test-open',
       handler: testopen
     },
     {

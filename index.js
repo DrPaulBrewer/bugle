@@ -6,14 +6,18 @@ const fs = require('fs');
 const driveX = require('decorated-google-drive');
 const googleapis = require('googleapis').google;
 const request = require('request');
+const opener = require('open-from-google-drive');
 const Iron = require('iron');
 const Boom = require('boom');
 const str = require('string-to-stream');
 
+
 function bugle(server, options, next) {
 
   const googleCred = server.registrations.grant.options.google; // requires Object { key, secret } -- other props ignored
-
+  const open = opener(googleapis,googleCred).open;
+  server.method('open',open);  
+  
   const cached = {};
 
   function cacheContent(what, path) {
@@ -31,6 +35,15 @@ function bugle(server, options, next) {
 
   if ((!googleCred) || (typeof (googleCred.key) !== 'string') || (typeof (googleCred.secret) !== 'string'))
     next(new Error("bugle: expected to find google credentials in grant module configuration"));
+
+  async function testopen(req, reply){
+    const params = req.params;
+    const fields = '*';
+    const maxSize = 100*1024;
+    const { user, file, contents } = await server.methods.open({ params, fields, maxSize });
+    const out = JSON.stringify([user,file,contents],null,2);
+    reply(out).type('text');
+  }
 
   function getTokensFromCookie(req) {
     let tokens;
@@ -173,6 +186,11 @@ function bugle(server, options, next) {
       method: 'GET',
       path: '/a/logout',
       handler: logout
+    },
+    {
+      method: 'GET',
+      path: '/a/test-open'
+      handler: testopen
     },
     {
       method: 'GET',

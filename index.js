@@ -1,6 +1,5 @@
-// jshint esversion:6, strict:global, node:true
-
-"use strict";
+// Copyright 2019- Paul Brewer, Economic and Financial Technology Consulting LLC <drpaulbrewer@eaftc.com>
+// License: MIT
 
 const fs = require('fs');
 const driveX = require('decorated-google-drive');
@@ -11,17 +10,28 @@ const Iron = require('iron');
 const Boom = require('boom');
 const str = require('string-to-stream');
 
-
 function bugle(server, options, next) {
 
   const googleCred = server.registrations.grant.options.google; // requires Object { key, secret } -- other props ignored
-  const open = opener(googleapis,googleCred).open;
-  server.method('open',open);  
-  
+
+  if (options.openurl) {
+    if (!options.hostname)
+      throw new Error("bugle: missing options.hostname");
+    const openCred = {
+      key: googleCred.key,
+      secret: googleCred.secret,
+      redirect: 'https://' + options.hostname + options.openurl
+    };
+    const openSelectedDriveFile = opener(googleapis, openCred).open;
+    server.method('openSelectedDriveFile', openSelectedDriveFile);
+  }
+
   const cached = {};
 
   function cacheContent(what, path) {
-    fs.readFile(path, (err, content) => { cached[what] = content; });
+    fs.readFile(path, (err, content) => {
+      cached[what] = content;
+    });
   }
 
   cacheContent('login', options.loginHTMLFile || __dirname + '/html/loginWithGoogleDrive.html');
@@ -30,19 +40,42 @@ function bugle(server, options, next) {
   function getCachedPage(what) {
     return function (req, reply) {
       reply(cached[what]).type('text/html');
-    }
+    };
   }
 
   if ((!googleCred) || (typeof (googleCred.key) !== 'string') || (typeof (googleCred.secret) !== 'string'))
     next(new Error("bugle: expected to find google credentials in grant module configuration"));
 
-  async function testopen(req, reply){
-    const params = req.params;
-    const fields = '*';
-    const maxSize = 100*1024;
-    const { user, file, contents } = await server.methods.open({ params, fields, maxSize });
-    const out = JSON.stringify([user,file,contents],null,2);
-    reply(out).type('text');
+  async function handleopen(req, reply) {
+    const params = req.query;
+    const fields = options.openfields || '*';
+    const maxSize = options.openmaxsize || 100 * 1024;
+    try {
+      const {
+        user,
+        file,
+        contents
+      } = await server.methods.openSelectedDriveFile({
+        params,
+        fields,
+        maxSize
+      });
+      if (typeof (server.methods.onopen) === 'function') {
+        await server.methods.onopen({
+          req,
+          reply,
+          user,
+          file,
+          contents
+        });
+      } else {
+        const out = JSON.stringify([user, file, contents], null, 2);
+        reply(out).type('text');
+      }
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.dir(e);  
+    }
   }
 
   function getTokensFromCookie(req) {
@@ -104,19 +137,21 @@ function bugle(server, options, next) {
       if (tokens.refresh_token) {
         pRefresh = (
           Iron.seal(tokens.refresh_token, refreshIronKey, Iron.defaults)
-          .then((sealed) => (drive.x.appDataFolder.upload2({
-            folderPath: '',
-            name: refreshFile,
-            stream: str(sealed),
-            mimeType: 'text/plain',
-            clobber: true
-          })))
+            .then((sealed) => (drive.x.appDataFolder.upload2({
+              folderPath: '',
+              name: refreshFile,
+              stream: str(sealed),
+              mimeType: 'text/plain',
+              clobber: true
+            })))
         );
       } else {
         pRefresh = (
           drive.x.appDataFolder.download(refreshFile)
-          .then((sealed) => (Iron.unseal(sealed, refreshIronKey, Iron.defaults)))
-          .then((refresh_token) => { tokens.refresh_token = refresh_token; })
+            .then((sealed) => (Iron.unseal(sealed, refreshIronKey, Iron.defaults)))
+            .then((refresh_token) => {
+              tokens.refresh_token = refresh_token;
+            })
         );
       }
     } else {
@@ -130,7 +165,7 @@ function bugle(server, options, next) {
           cookieManager.set('bugle', tokens);
           reply.redirect(options.myRedirect || '/a/me');
         },
-        (e) => {
+        () => {
           reply.redirect('/a/googledriveretry');
         })
     );
@@ -139,7 +174,9 @@ function bugle(server, options, next) {
   function driveUserProfile(req, reply) {
     const drive = req.drive;
     if (drive)
-      drive.x.aboutMe().then(reply).catch((e) => { reply(Boom.badData("no response from Google Drive")); });
+      drive.x.aboutMe().then(reply).catch(() => {
+        reply(Boom.badData("no response from Google Drive"));
+      });
     else reply.redirect('/a/googledriveretry').takeover();
   }
 
@@ -152,7 +189,11 @@ function bugle(server, options, next) {
           (req.session || req.yar).set('bugle', tokens);
         }
       }
-    } catch (e) {} // ignore errors here resetting cookie - worst case is the access_token never updates and googleapis uses the refresh_token every time to get an access_token
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log("driveUpdateTokens: " + e.toString());
+    }
+    // ignore errors here resetting cookie - worst case is the access_token never updates and googleapis uses the refresh_token every time to get an access_token
     reply.continue();
   }
 
@@ -163,74 +204,75 @@ function bugle(server, options, next) {
   }
 
   server.ext([{
-      type: 'onPreAuth',
-      method: spinupGoogleDrive
-    },
-    {
-      type: 'onPostHandler',
-      method: driveUpdateTokens
-    }
+    type: 'onPreAuth',
+    method: spinupGoogleDrive
+  },
+  {
+    type: 'onPostHandler',
+    method: driveUpdateTokens
+  }
   ]);
 
+  if (options.openurl){
+    server.route({
+      method: 'GET',
+      path: options.openurl,
+      handler: handleopen
+    });
+  }
+
   server.route([{
-      method: 'GET',
-      path: googleCred.callback,
-      handler: hapiDriveConductor
-    },
-    {
-      method: 'GET',
-      path: '/a/login',
-      handler: getCachedPage('login')
-    },
-    {
-      method: 'GET',
-      path: '/a/logout',
-      handler: logout
-    },
-    {
-      method: 'GET',
-      path: '/a/test-open',
-      handler: testopen
-    },
-    {
-      method: 'GET',
-      path: '/a/googledriveretry',
-      handler: getCachedPage('retry')
-    },
-    {
-      method: 'GET',
-      path: '/a/googledrivereset',
-      handler: getCachedPage('retry')
-    },
-    {
-      method: 'GET',
-      path: '/a/me',
-      config: {
-        pre: [{
-          method: driveUserProfile,
-          assign: 'me',
-          failAction: 'error'
-        }],
-        handler: function (req, reply) {
-          let page = '';
-          const level = options.useMeLevel || 0;
-          if (level > 0) {
-            if (level > 0) page += '<h2>Welcome, ' + req.pre.me.user.displayName + '</h2>';
-            if (level > 0) page += '<img src="' + req.pre.me.user.photoLink + '" />';
-            if (level > 1) page += '<p>From Drive</p><pre>' + JSON.stringify(req.pre.me, null, 4) + '</pre>';
-            if (level > 2) page += '<p>From req.headers</p><pre>' + JSON.stringify(req.headers, null, 4) + '</pre>';
-            if (level > 3) page += '<p>From req.info</p><pre>' + JSON.stringify(req.info, null, 4) + '</pre>';
-            page += '<p><a href="/a/logout">Logout</a></p>';
-            reply(page);
-          } else {
-            reply(Boom.notFound());
-          }
+    method: 'GET',
+    path: googleCred.callback,
+    handler: hapiDriveConductor
+  },
+  {
+    method: 'GET',
+    path: '/a/login',
+    handler: getCachedPage('login')
+  },
+  {
+    method: 'GET',
+    path: '/a/logout',
+    handler: logout
+  },
+  {
+    method: 'GET',
+    path: '/a/googledriveretry',
+    handler: getCachedPage('retry')
+  },
+  {
+    method: 'GET',
+    path: '/a/googledrivereset',
+    handler: getCachedPage('retry')
+  },
+  {
+    method: 'GET',
+    path: '/a/me',
+    config: {
+      pre: [{
+        method: driveUserProfile,
+        assign: 'me',
+        failAction: 'error'
+      }],
+      handler: function (req, reply) {
+        let page = '';
+        const level = options.useMeLevel || 0;
+        if (level > 0) {
+          if (level > 0) page += '<h2>Welcome, ' + req.pre.me.user.displayName + '</h2>';
+          if (level > 0) page += '<img src="' + req.pre.me.user.photoLink + '" />';
+          if (level > 1) page += '<p>From Drive</p><pre>' + JSON.stringify(req.pre.me, null, 4) + '</pre>';
+          if (level > 2) page += '<p>From req.headers</p><pre>' + JSON.stringify(req.headers, null, 4) + '</pre>';
+          if (level > 3) page += '<p>From req.info</p><pre>' + JSON.stringify(req.info, null, 4) + '</pre>';
+          page += '<p><a href="/a/logout">Logout</a></p>';
+          reply(page);
+        } else {
+          reply(Boom.notFound());
         }
       }
     }
+  }
   ]);
-
-
 
   next(); // call next to complete plugin registration
 

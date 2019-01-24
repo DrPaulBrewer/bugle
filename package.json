@@ -33,5 +33,8 @@
     "open-from-google-drive": "^0.1.0",
     "request": "^2.85.0",
     "string-to-stream": "^1.1.1"
+  },
+  "devDependencies": {
+    "eslint": "^5.12.1"
   }
 }

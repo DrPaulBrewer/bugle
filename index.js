@@ -14,13 +14,13 @@ function bugle(server, options, next) {
 
   const googleCred = server.registrations.grant.options.google; // requires Object { key, secret } -- other props ignored
 
-  if (options.openurl) {
+  if (options.openUrl) {
     if (!options.hostname)
       throw new Error("bugle: missing options.hostname");
     const openCred = {
       key: googleCred.key,
       secret: googleCred.secret,
-      redirect: 'https://' + options.hostname + options.openurl
+      redirect: 'https://' + options.hostname + options.openUrl
     };
     const openSelectedDriveFile = opener(googleapis, openCred).open;
     server.method('openSelectedDriveFile', openSelectedDriveFile);
@@ -74,7 +74,7 @@ function bugle(server, options, next) {
       }
     } catch (e) {
       // eslint-disable-next-line no-console
-      console.dir(e);  
+      console.dir(e);
     }
   }
 
@@ -213,10 +213,10 @@ function bugle(server, options, next) {
   }
   ]);
 
-  if (options.openurl){
+  if (options.openUrl){
     server.route({
       method: 'GET',
-      path: options.openurl,
+      path: options.openUrl,
       handler: handleopen
     });
   }

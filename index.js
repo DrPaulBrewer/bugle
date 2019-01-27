@@ -183,19 +183,22 @@ function bugle(server, options, next) {
   }
 
   function driveUpdateTokens(req, reply) {
-    try {
-      const tokens = req.drive.x.auth.credentials;
-      if (tokens.access_token && tokens.refresh_token) {
-        const old_access_token = (req.session || req.yar).get('bugle').access_token;
-        if (old_access_token !== tokens.access_token) {
-          (req.session || req.yar).set('bugle', tokens);
+    if (req && req.drive) {
+      try {
+        const tokens = req.drive.x.auth.credentials;
+        if (tokens.access_token && tokens.refresh_token) {
+          const old_access_token = (req.session || req.yar).get('bugle').access_token;
+          if (old_access_token !== tokens.access_token) {
+            (req.session || req.yar).set('bugle', tokens);
+          }
         }
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.log("driveUpdateTokens: " + e.toString());
       }
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.log("driveUpdateTokens: " + e.toString());
+      // ignore errors here resetting cookie - worst case is the access_token never updates and googleapis uses the refresh_token every time to get an access_token
+      delete req.drive;
     }
-    // ignore errors here resetting cookie - worst case is the access_token never updates and googleapis uses the refresh_token every time to get an access_token
     reply.continue();
   }
 
@@ -215,7 +218,7 @@ function bugle(server, options, next) {
   }
   ]);
 
-  if (options.openUrl){
+  if (options.openUrl) {
     server.route({
       method: 'GET',
       path: options.openUrl,

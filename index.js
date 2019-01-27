@@ -184,7 +184,7 @@ function bugle(server, options, next) {
 
   function driveUpdateTokens(req, reply) {
     try {
-      const tokens = req.drive._options.auth.credentials;
+      const tokens = req.drive.x.auth.credentials;
       if (tokens.access_token && tokens.refresh_token) {
         const old_access_token = (req.session || req.yar).get('bugle').access_token;
         if (old_access_token !== tokens.access_token) {

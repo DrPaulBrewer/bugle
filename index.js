@@ -53,6 +53,7 @@ function bugle(server, options, next) {
     try {
       const {
         user,
+        drive,
         file,
         contents
       } = await server.methods.openSelectedDriveFile({
@@ -65,6 +66,7 @@ function bugle(server, options, next) {
           req,
           reply,
           user,
+          drive,
           file,
           contents
         });

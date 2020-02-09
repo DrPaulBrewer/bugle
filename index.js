@@ -186,11 +186,15 @@ function bugle(server, options, next) {
     if (req && req.drive) {
       try {
         const tokens = req.drive.x.auth.credentials;
-        if (tokens.access_token && tokens.refresh_token) {
-          const old_access_token = (req.session || req.yar).get('bugle').access_token;
+        if (tokens && tokens.access_token && tokens.refresh_token) {
+          const cookieSource = (req.session || req.yar);
+          const bugleCookie = cookieSource.get('bugle');
+          const old_access_token = bugleCookie && bugleCookie.access_token;
           if (old_access_token !== tokens.access_token) {
-            (req.session || req.yar).set('bugle', tokens);
+            cookieSource.set('bugle', tokens);
           }
+        } else {
+          throw new Error("tokens, tokens.access_token, or tokens.refresh_token is undefined");
         }
       } catch (e) {
         // eslint-disable-next-line no-console

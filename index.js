@@ -210,7 +210,7 @@ function bugle(server, options, next) {
   function logout(req, reply) {
     const cookieManager = (req.session || req.yar);
     cookieManager.reset();
-    reply('Goodbye').type('html');
+    reply(cached.logout).type('text/html');
   }
 
   server.ext([{

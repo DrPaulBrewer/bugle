@@ -34,8 +34,9 @@ function bugle(server, options, next) {
     });
   }
 
-  cacheContent('login', options.loginHTMLFile || __dirname + '/html/loginWithGoogleDrive.html');
-  cacheContent('retry', options.retryHTMLFile || __dirname + '/html/retryWithGoogleDrive.html');
+  cacheContent('login', options.loginHTMLFile  || __dirname + '/html/loginWithGoogleDrive.html');
+  cacheContent('logout',options.logoutHTMLFile || __dirname + '/html/logout.html');
+  cacheContent('retry', options.retryHTMLFile  || __dirname + '/html/retryWithGoogleDrive.html');
 
   function getCachedPage(what) {
     return function (req, reply) {
@@ -209,7 +210,7 @@ function bugle(server, options, next) {
   function logout(req, reply) {
     const cookieManager = (req.session || req.yar);
     cookieManager.reset();
-    reply('Goodbye').type('text/plain');
+    reply('Goodbye').type('html');
   }
 
   server.ext([{

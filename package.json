@@ -31,7 +31,7 @@
     "decorated-google-drive": "^6.0.2",
     "googleapis": "^58.0.0",
     "iron": "^5.0.6",
-    "open-from-google-drive": "^0.1.0",
+    "open-from-google-drive": "^0.2.0",
     "string-to-stream": "^1.1.1"
   },
   "devDependencies": {

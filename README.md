@@ -11,7 +11,8 @@ A Hapi plugin for Google Drive Login with:
 ### Compatibility
 
 * bugle@1 and bugle@2 work with hapi 16 but not hapi 17
-* bugle > 2.10 includes googleapis@47.0.0 for `request.drive` 
+* bugle >= 2.12 includes googleapis@58.0.0 for `request.drive`
+* bugle >= 2.12 uses `npm:axios` for uploads, earlier versions use `npm:request`
 
 ### Installation
 
@@ -27,7 +28,7 @@ You also need grant and probably yar.
 #### ./path/to/hapi/config/bugle.json
 
 If you want to store encrypted refresh tokens for each user in their own Drive appDataFolder, where they can't change them and no one else will likely see
-them, add the "refreshTokenStash" setting below. Otherwise that can be omitted. 
+them, add the "refreshTokenStash" setting below. Otherwise that can be omitted.
 
     {
       "drive": {
@@ -38,7 +39,7 @@ them, add the "refreshTokenStash" setting below. Otherwise that can be omitted.
 	      }
        },
        "myRedirect": "/a/me", // where to send users who have logged in with Google Drive -- defaults to /a/me
-       "useMeLevel": 2, // level from 0-4 to determine what to return from /a/me -- 0 is 404 (default), 1 is name+pic, 2 includes drive profile, 3 headers, 4 server info 
+       "useMeLevel": 2, // level from 0-4 to determine what to return from /a/me -- 0 is 404 (default), 1 is name+pic, 2 includes drive profile, 3 headers, 4 server info
        "loginHTMLFile": "/path/to/your/login.html", // optional HTML file to show at URL /a/login -- default provided
        "retryHTMLFile": "/path/to/your/retry.html"  // also optional
     }
@@ -51,7 +52,7 @@ them, add the "refreshTokenStash" setting below. Otherwise that can be omitted.
 Configure grant like this for an app that wants to:
 
 * read/write its own files from the user's Google Drive
-* read/write the secret appDataFolder on the user's Google Drive 
+* read/write the secret appDataFolder on the user's Google Drive
 
 ```
 {
@@ -66,7 +67,7 @@ Configure grant like this for an app that wants to:
         "key": "your-api-console-drive-client-id-goes-here",
         "secret": "your-api-console-drive-secret-goes-here"
         "scope": [
-             "https://www.googleapis.com/auth/drive.file",	
+             "https://www.googleapis.com/auth/drive.file",
              "https://www.googleapis.com/auth/drive.appdata"
          ],
         "callback": "/a/googledrive",
@@ -84,7 +85,7 @@ In documentation, though, it is suggested to reuse the old refresh tokens until 
 
 #### ./path/to/hapi/config/yar.json
 
-`isSameSite:false` turns off some cookie same site protection that was problematic with yar + chrome browser - use at own risk or omit 
+`isSameSite:false` turns off some cookie same site protection that was problematic with yar + chrome browser - use at own risk or omit
 
     {
        "cookieOptions": {
@@ -132,7 +133,7 @@ server.register([
     // REQUIRED: bugle, grabs google config from grant, and own config from bugle.json
     {
 	register: bugle,
-	options: require('./config/bugle.json') 
+	options: require('./config/bugle.json')
     }
 ], function(err){
     if (err) throw new Error(err);
@@ -148,7 +149,7 @@ server.register([
 ## Features
 
 * provides several routes under `/a` to deal with `/a/login`, `/a/logout`, `/a/googledriveretry` retries, `/a/me` Google Drive User's profile
-* inherits route `/connect/google` as alternate login point from `grant` 
+* inherits route `/connect/google` as alternate login point from `grant`
 * `request` decorated with `.drive` from [decorated-google-drive](https://github.com/DrPaulBrewer/decorated-google-drive) at `onPreAuth`
  * `req.drive` and `req.drive.x` are built from and on top of `npm:googleapis`
  * `req.drive` without the `.x` is a vanilla `npm:googleapis.drive` client
@@ -158,7 +159,7 @@ server.register([
    * how to make paths like `mkdir -p` does
    * creating upload URLs for later uploads, and doing resumable upload now for bigger files
    * more (see decorated-google-drive)
-* `request.drive` will use `googleapis` to try to auto-update its Google Drive OAuth2 access_token from the OAuth2 refresh_token 
+* `request.drive` will use `googleapis` to try to auto-update its Google Drive OAuth2 access_token from the OAuth2 refresh_token
 * token/cookie management
    * updated Google Drive tokens are pushed out into the session cookie automatically at `onPostHandler`
    * new Google Drive OAuth2 refresh tokens can be stashed in the user's Drive appDataFolder in an encrypted file for safe keeping
@@ -177,6 +178,6 @@ This software is 3rd party software.
 It is not a product of Google, Inc.
 
 Google Drive[tm] is a trademark of Google, Inc.
-    
+
 npm: googleapis is a Google-provided nodejs client for Google APIs such as Google Drive, linked to/referenced from our code. License: Apache 2.0
 A copy is not included herein, but running `npm install` may install one.

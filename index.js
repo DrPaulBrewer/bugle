@@ -4,7 +4,7 @@
 const fs = require('fs');
 const driveX = require('decorated-google-drive');
 const googleapis = require('googleapis').google;
-const request = require('request');
+const axios = require('axios');
 const opener = require('open-from-google-drive');
 const Iron = require('iron');
 const Boom = require('boom');
@@ -114,11 +114,11 @@ function bugle(server, options, next) {
     const tokens = getTokensFromCookie(req);
     if (tokens && (tokens.access_token)) {
       req.drive = driveX({
-        googleapis,
-        request,
-        googleCred,
-        tokens, 
-        options.hexidSalt
+        google: googleapis,
+        axios,
+        keys: googleCred,
+        tokens,
+        salt: options.hexidSalt
       });
     }
     reply.continue();

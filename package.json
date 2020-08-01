@@ -19,19 +19,19 @@
   "author": "drpaulbrewer@eaftc.com",
   "license": "MIT",
   "engines": {
-    "node": ">=8"
+    "node": ">=12"
   },
   "peerDependencies": {
     "grant-hapi": ">=3.8.0 <4",
     "hapi": ">=16.0.0 <17"
   },
   "dependencies": {
+    "axios": "^0.19.2",
     "boom": "^7.3.0",
-    "decorated-google-drive": "^5.4.0",
-    "googleapis": "^47.0.0",
+    "decorated-google-drive": "^6.0.2",
+    "googleapis": "^58.0.0",
     "iron": "^5.0.6",
     "open-from-google-drive": "^0.1.0",
-    "request": "^2.88.2",
     "string-to-stream": "^1.1.1"
   },
   "devDependencies": {

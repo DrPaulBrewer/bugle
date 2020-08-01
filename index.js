@@ -113,7 +113,13 @@ function bugle(server, options, next) {
   function spinupGoogleDrive(req, reply) {
     const tokens = getTokensFromCookie(req);
     if (tokens && (tokens.access_token)) {
-      req.drive = driveX(googleapis, request, googleCred, tokens, options.hexidSalt);
+      req.drive = driveX({
+        googleapis,
+        request,
+        googleCred,
+        tokens, 
+        options.hexidSalt
+      });
     }
     reply.continue();
   }

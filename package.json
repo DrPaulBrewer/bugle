@@ -29,7 +29,7 @@
     "axios": "^0.19.2",
     "boom": "^7.3.0",
     "decorated-google-drive": "^6.0.2",
-    "googleapis": "^58.0.0",
+    "googleapis": "^150.0.1",
     "iron": "^5.0.6",
     "open-from-google-drive": "^0.2.0",
     "string-to-stream": "^1.1.1"
